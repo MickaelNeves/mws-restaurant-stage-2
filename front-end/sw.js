@@ -1,14 +1,12 @@
-let staticCacheName = 'mws-restaurant-cache-v4';
+let staticCacheName = 'mws-restaurant-cache-v6';
 let urlsToCache = [
     '/',
     '/index.html',
-    '/data/restaurants.json',
     '/restaurant.html',
     '/css/styles.css',
     '/js/dbhelper.js',
     '/js/main.js',
     '/js/restaurant_info.js',
-    '/js/serviceworker_init.js',
     '/img/1.jpg',
     '/img/2.jpg',
     '/img/3.jpg',
@@ -43,33 +41,15 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener('fetch', event => {
-    /* for restaurant info urls */
-    if(event.request.url.includes('restaurant.html?id=')){
-        const strippedurl = event.request.url.split('?')[0];
-
-        event.respondWith(
-            caches.match(strippedurl).then(response => {
-                return response || fetch(event.response);
-            })
-        );
-        return;
-    }
-    /* for all other urls */
     event.respondWith(
-        caches.match(event.request).then(response => {
-            if (response) {
-                return response;
-            }else {
-                return fetch(event.request).then(response => {
-                    let cloneResp = response.clone();
-
-                    caches.open(staticCacheName).then(cache => {
-                        cache.put(event.request, cloneResp);
-                    });
+        caches.open(staticCacheName).then(cache => {
+            return cache.match(event.request).then(response => {
+                return response || fetch(event.request).then(response => {
+                    cache.put(event.request, response.clone());
                     return response;
                 });
-            }
-        }).catch(error => console.error("Fetch Error:", error))
+            });
+        })
     );
 });
 
