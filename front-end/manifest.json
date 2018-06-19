@@ -1,0 +1,23 @@
+{
+    "manifest_version": 1,
+    "short_name": "Restaurants",
+    "name": "Restaurants Review App",
+    "icons": [
+        {
+            "src": "img/icon-128.png",
+            "type": "image/png",
+            "sizes": "128x128"
+        },
+        {
+            "src": "img/icon-16.png",
+            "type": "image/png",
+            "sizes": "16x16"
+        }
+    ],
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#2196F3",
+    "orientation": "portrait",
+    "theme_color": "#2196F3"
+}

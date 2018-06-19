@@ -2,7 +2,6 @@ let staticCacheName = 'mws-restaurant-cache-v6';
 let urlsToCache = [
     '/',
     '/index.html',
-    '/restaurant.html',
     '/css/styles.css',
     '/js/dbhelper.js',
     '/js/main.js',
