@@ -144,6 +144,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     ul.append(createRestaurantHTML(restaurant));
   });
   addMarkersToMap();
+  loadingImages();
 }
 
 /**
@@ -155,8 +156,10 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.alt = restaurant.name + " in " + restaurant.neighborhood;
   image.title = restaurant.name;
-  image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.className = 'restaurant-img lazy';
+  image.src = 'img/lazy.png';
+  image.dataset.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.dataset.srcset = `img/${restaurant.id}-small.jpg 300w`;
   li.append(image);
 
   const name = document.createElement('h1');
@@ -195,4 +198,47 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     });
     self.markers.push(marker);
   });
+}
+
+/**
+ * Lazy loading from https://developers.google.com/web/fundamentals/performance/lazy-loading-guidance/images-and-video/
+ */
+loadingImages = () => {
+  let lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+  let active = false;
+
+  const lazyLoad = function () {
+    if (active === false) {
+      active = true;
+
+      setTimeout(function () {
+        lazyImages.forEach(function (lazyImage) {
+          if ((lazyImage.getBoundingClientRect().top <= window.innerHeight && lazyImage.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyImage).display !== "none") {
+            lazyImage.src = lazyImage.dataset.src;
+            lazyImage.srcset = lazyImage.dataset.srcset;
+            lazyImage.classList.remove("lazy");
+
+            lazyImages = lazyImages.filter(function (image) {
+              return image !== lazyImage;
+            });
+
+            if (lazyImages.length === 0) {
+              document.removeEventListener("scroll", lazyLoad);
+              window.removeEventListener("resize", lazyLoad);
+              window.removeEventListener("orientationchange", lazyLoad);
+            }
+          }
+        });
+
+        active = false;
+      }, 200);
+    }
+  };
+
+  document.addEventListener("scroll", lazyLoad, {
+    capture: true,
+    passive: true
+  });
+  window.addEventListener("resize", lazyLoad);
+  window.addEventListener("orientationchange", lazyLoad);
 }
